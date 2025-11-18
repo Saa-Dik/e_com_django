@@ -1,5 +1,5 @@
 from django import forms
-from . models import Account
+from . models import Account ,Address,UserAddress
 from django.core.exceptions import ValidationError
 # customize:
 class RegistationForm(forms.ModelForm):
@@ -34,3 +34,27 @@ class RegistationForm(forms.ModelForm):
         self.fields['password'].widget.attrs['placeholder'] = 'Enter Your Password'
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ["first_name", "last_name", "email", "phone_number"]
+
+
+class AddressForm(forms.ModelForm):
+    class Meta:
+        model = Address
+        fields = [
+            "name", "phone", "email",
+            "address_line_1", "address_line_2",
+            "city", "state", "country", "postal_code",
+            "is_default"
+        ]
+class AddressForm(forms.ModelForm):
+    class Meta:
+        model = UserAddress
+        fields = [
+            'full_name', 'phone',
+            'address_line_1', 'address_line_2',
+            'city', 'state', 'postal_code', 'country'
+        ]

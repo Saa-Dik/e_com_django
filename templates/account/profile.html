@@ -1,582 +1,343 @@
-
-
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}My Profile | Kinbo Shop{% endblock %}
-
-{% block category %}{% endblock %}
+{% block title %}My Profile{% endblock %}
 
 {% block content %}
-  <div class="min-h-screen bg-orange-50 py-10">
-    <div class="max-w-[1320px] mx-auto px-4 space-y-6" style="padding-left: 0px;padding-right: 0px;">
-      <h1 class="text-3xl font-bold text-orange-600 text-center">My Profile</h1>
-      <!-- PROFILE OVERVIEW -->
-      <section class="bg-white rounded-xl shadow p-6 flex flex-col md:flex-row items-center md:items-start gap-6">
-        <div class="flex-shrink-0 relative group cursor-pointer">
-          <img id="profileAvatarImg" src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" class="w-24 h-24 rounded-full object-cover border border-orange-300">
-        <!-- Hover overlay -->
-          <label for="avatarInput" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 text-white text-xs rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition">
-            Change
-          </label>
-          <input type="file" id="avatarInput" accept="image/*" class="hidden">
 
-        </div>
-        <!-- Basic Info -->
-        <div class="flex-1 w-full">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div>
-              <p class="text-xl font-semibold text-gray-900" id="profileNameDisplay">
-                {{ user.first_name }} {{ user.last_name }}
-              </p>
-              <p class="text-sm text-gray-600" id="profileEmailDisplay">{{ user.email }}</p>
-              {% if user.phone_number %}
-                <p class="text-sm text-gray-600" id="profilePhoneDisplay">{{ user.phone_number }}</p>
-              {% endif %}
+<div class="min-h-screen bg-orange-50 py-10">
+    <div class="max-w-5xl mx-auto px-4 space-y-6">
+
+        <h1 class="text-3xl font-bold text-orange-600 text-center">My Profile</h1>
+
+        <!-- =========================
+             PROFILE HEADER
+        ========================== -->
+        <section class="bg-white rounded-xl shadow p-6 flex flex-col md:flex-row items-center gap-6">
+            
+            <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}"
+                 class="w-24 h-24 rounded-full object-cover border border-orange-300">
+
+            <div class="flex-1 w-full">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+
+                    <div>
+                        <p class="text-xl font-semibold text-gray-900">
+                            {{ user.first_name }} {{ user.last_name }}
+                        </p>
+                        <p class="text-sm text-gray-600">{{ user.email }}</p>
+                        {% if user.phone_number %}
+                        <p class="text-sm text-gray-600">{{ user.phone_number }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- <button onclick="document.getElementById('editProfileModal').classList.remove('hidden')"
+                        class="px-4 py-2 rounded-lg bg-orange-600 text-white text-sm font-medium hover:bg-orange-700">
+                        Edit Info
+                    </button> -->
+                </div>
             </div>
-            <button id="editProfileInfoBtn" type="button" class="px-4 py-2 rounded-lg bg-orange-600 text-white text-sm font-medium hover:bg-orange-700 transition">Edit Info</button>
-          </div>
-        </div>
-      </section>
-      <!-- 🧭 TABS CONTAINER -->
-      <section class="bg-white rounded-xl shadow p-6">
-        <div class="border-b mb-4 overflow-x-auto">
-          <div class="flex gap-4 min-w-max">
-            <button type="button" class="py-2 px-3 border-b-2 border-orange-600 text-orange-600 font-semibold text-sm whitespace-nowrap" data-tab-target="accountTab">Account Info</button>
-            <button type="button" class="py-2 px-3 border-b-2 border-transparent text-gray-600 hover:text-orange-600 text-sm whitespace-nowrap" data-tab-target="addressesTab">Addresses</button>
-            <button type="button" class="py-2 px-3 border-b-2 border-transparent text-gray-600 hover:text-orange-600 text-sm whitespace-nowrap" data-tab-target="securityTab">Security</button>
-          </div>
-        </div>
-        <div class="mt-4">
-          <!-- 🧾 ACCOUNT INFO TAB -->
-          <div id="accountTab" data-tab-content class="space-y-4">
-            <form id="accountInfoForm" method="POST" action="{% url 'profile' %}" novalidate class="space-y-4 max-w-xl">
-              {% csrf_token %}
-              <div>
-                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                <input id="first_name" name="first_name" type="text" required class="w-full px-4 py-2 border rounded focus:border-orange-500 focus:ring focus:ring-orange-200 outline-none text-gray-800" value="{{ user.first_name }}">
-              </div>
+        </section>
 
-              <div>
-                <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                <input id="last_name" name="last_name" type="text" required class="w-full px-4 py-2 border rounded focus:border-orange-500 focus:ring focus:ring-orange-200 outline-none text-gray-800" value="{{ user.last_name }}">
-              </div>
+        <!-- =========================
+             TABS
+        ========================== -->
+        <section class="bg-white rounded-xl shadow p-6">
 
-              <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input id="email" name="email" type="email" required class="w-full px-4 py-2 border rounded focus:border-orange-500 focus:ring focus:ring-orange-200 outline-none text-gray-800" value="{{ user.email }}">
-              </div>
+            <div class="border-b mb-4 flex gap-4 overflow-x-auto">
+                <button class="tab-btn active-tab" data-tab="infoTab">Account Info</button>
+                <button class="tab-btn" data-tab="addressTab">Addresses</button>
+                <button class="tab-btn" data-tab="securityTab">Security</button>
+            </div>
 
-              <div>
-                <label for="phoneAccount" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                <input id="phone_number" name="phone_number" type="tel" class="w-full px-4 py-2 border rounded focus:border-orange-500 focus:ring focus:ring-orange-200 outline-none text-gray-800" value="{{ user.phone_number|default:'' }}" placeholder="Optional">
-              </div>
-              <button type="submit" class="w-full sm:w-auto bg-orange-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-orange-700 transition">Save Changes</button>
-            </form>
-          </div>
-          <div id="addressesTab" data-tab-content class="hidden space-y-4">
+            <div>
 
-          <!-- Header row: title + Add button -->
-          
+                <!-- =========================
+                     TAB 1: ACCOUNT INFO
+                ========================== -->
+                <div id="infoTab" class="tab-content">
 
-          <!-- Saved Address Cards -->
-          <div id="addressList" class="space-y-3">
-            {% if addresses %}
-              {% for order in addresses %}
-                <div class="p-4 border rounded-lg space-y-1 shadow {% if order == default_address %} bg-orange-50 border-orange-400 {% else %} bg-white {% endif %}">
-                  {% if order == default_address %}
-                    <span class="text-xs font-semibold text-orange-700 bg-orange-200 px-2 py-1 rounded">
-                      Default Delivery Address
-                    </span>
-                  {% else %}
-                    <button class="text-xs bg-gray-100 px-2 py-1 rounded set-default-btn" data-id="{{ order.id }}">Set as Default</button>
-                  {% endif %}
-                  <p class="text-sm text-gray-900 font-semibold">
-                    {{ order.first_name }} {{ order.last_name }}
-                  </p>
-                  <p class="text-sm text-gray-700">
-                    Phone: {{ order.phone }}
-                  </p>
-                  <p class="text-sm text-gray-700">
-                    Email: {{ order.email }}
-                  </p>
-                  <p class="text-sm text-gray-700"> Address: {{ order.address_line_1 }}
-                    {% if order.address_line_2 %}, {{ order.address_line_2 }}{% endif %}, {{ order.city }}, {{ order.state }}, {{ order.country }}
-                  </p>
-                  <p class="text-xs text-gray-500">
-                    Used on Order: {{ order.order_number }} ({{ order.created_at|date:"M d, Y" }})
-                  </p>
+                    <form method="POST" action="{% url 'profile' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="update_profile" value="1">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <div>
+                                <label class="text-sm font-medium">First Name</label>
+                                <input name="first_name" value="{{ user.first_name }}" class="input">
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-medium">Last Name</label>
+                                <input name="last_name" value="{{ user.last_name }}" class="input">
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-medium">Email</label>
+                                <input type="email" name="email" value="{{ user.email }}" class="input">
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-medium">Phone Number</label>
+                                <input name="phone_number" value="{{ user.phone_number }}" class="input">
+                            </div>
+
+                        </div>
+
+                        <button type="submit"
+                            class="px-6 py-2 mt-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+                            Save Changes
+                        </button>
+
+                    </form>
+
                 </div>
 
-              {% endfor %}
-            {% else %}
-              <p class="text-sm text-gray-500">You have no saved address yet.</p>
-            {% endif %}
-          </div>
-        </div>
-      </section>
+                <!-- =========================
+                     TAB 2: ADDRESSES
+                ========================== -->
+                <div id="addressTab" class="tab-content hidden">
+
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-semibold text-gray-700">Saved Addresses</h2>
+                        <button onclick="document.getElementById('addAddressModal').classList.remove('hidden')" 
+                                class="px-4 py-2 bg-orange-600 text-white rounded-lg">
+                            Add New Address
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+
+                        {% if addresses %}
+                        {% for addr in addresses %}
+                        <div class="p-4 border rounded-lg shadow bg-white">
+
+                            {% if addr.is_default %}
+                                <span class="text-xs bg-orange-200 text-orange-700 px-2 py-1 rounded">
+                                    Default Address
+                                </span>
+                            {% else %}
+                                <a href="{% url 'set_default_address' addr.id %}"
+                                   class="text-xs bg-gray-100 px-2 py-1 rounded ml-2">Set Default</a>
+                            {% endif %}
+
+                            <p class="font-semibold mt-1">{{ addr.full_name }}</p>
+                            <p class="text-sm">Phone: {{ addr.phone }}</p>
+                            <p class="text-sm">
+                                {{ addr.address_line_1 }}
+                                {% if addr.address_line_2 %}, {{ addr.address_line_2 }}{% endif %},
+                                {{ addr.city }}, {{ addr.state }},
+                                {{ addr.country }} - {{ addr.postal_code }}
+                            </p>
+
+                            <div class="flex gap-2 mt-3">
+                                <button onclick="openEditAddressModal({{ addr.id }}, '{{ addr.full_name }}', 
+                                        '{{ addr.phone }}', '{{ addr.address_line_1 }}', 
+                                        '{{ addr.address_line_2 }}', '{{ addr.city }}',
+                                        '{{ addr.state }}', '{{ addr.postal_code }}', '{{ addr.country }}',
+                                        {{ addr.is_default|yesno:"true,false" }})"
+                                    class="px-3 py-1 bg-gray-200 rounded text-xs">
+                                    Edit
+                                </button>
+
+                                <a href="{% url 'delete_address' addr.id %}"
+                                   onclick="return confirm('Delete address?')"
+                                   class="px-3 py-1 bg-red-300 rounded text-xs">
+                                    Delete
+                                </a>
+                            </div>
+
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p class="text-sm text-gray-500">No addresses saved yet.</p>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- =========================
+                     TAB 3: SECURITY
+                ========================== -->
+                <div id="securityTab" class="tab-content hidden">
+                    <p class="text-gray-600 text-sm">
+                        Password reset is available using the "Forgot Password" option from login page.
+                    </p>
+                </div>
+
+            </div>
+        </section>
 
     </div>
-
-  </div>
-{% endblock %}
+</div>
 
 
 
-<!-- 🧠 PROFILE PAGE SCRIPTS -->
+<!-- ========================================================
+     ADD ADDRESS MODAL
+========================================================= -->
+<div id="addAddressModal"
+     class="hidden fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+
+    <div class="bg-white p-5 rounded-xl w-full max-w-lg shadow">
+
+        <h2 class="text-lg font-semibold mb-3">Add New Address</h2>
+
+        <form method="POST" action="{% url 'add_address' %}">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                <input name="full_name" placeholder="Full Name" class="input" required>
+                <input name="phone" placeholder="Phone Number" class="input" required>
+
+                <input name="address_line_1" placeholder="Address Line 1" class="input" required>
+                <input name="address_line_2" placeholder="Address Line 2" class="input">
+
+                <input name="city" placeholder="City" class="input" required>
+                <input name="state" placeholder="State" class="input" required>
+
+                <input name="postal_code" placeholder="Postal Code" class="input" required>
+                <input name="country" placeholder="Country" class="input" required>
+
+            </div>
+
+            <label class="flex items-center gap-2 mt-2">
+                <input type="checkbox" name="is_default">
+                <span>Set as Default</span>
+            </label>
+
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" onclick="document.getElementById('addAddressModal').classList.add('hidden')"
+                    class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+
+                <button class="px-4 py-2 bg-orange-600 text-white rounded">Save</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+
+<!-- ========================================================
+     EDIT ADDRESS MODAL
+========================================================= -->
+<div id="editAddressModal"
+     class="hidden fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+
+    <div class="bg-white p-5 rounded-xl w-full max-w-lg shadow">
+
+        <h2 class="text-lg font-semibold mb-3">Edit Address</h2>
+
+        <form id="editAddressForm" method="POST">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                <input id="e_full_name" name="full_name" class="input" required>
+                <input id="e_phone" name="phone" class="input" required>
+
+                <input id="e_address_line_1" name="address_line_1" class="input" required>
+                <input id="e_address_line_2" name="address_line_2" class="input">
+
+                <input id="e_city" name="city" class="input" required>
+                <input id="e_state" name="state" class="input" required>
+
+                <input id="e_postal_code" name="postal_code" class="input" required>
+                <input id="e_country" name="country" class="input" required>
+
+            </div>
+
+            <label class="flex items-center gap-2 mt-2">
+                <input id="e_is_default" type="checkbox" name="is_default">
+                <span>Set as Default</span>
+            </label>
+
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" onclick="document.getElementById('editAddressModal').classList.add('hidden')"
+                    class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+
+                <button class="px-4 py-2 bg-orange-600 text-white rounded">Update</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+
+<!-- ========================================================
+     JS (TABS + EDIT MODAL)
+========================================================= -->
 <script>
-  // =========================
-  // 🌐 TAB LOGIC
-  // =========================
-  const tabButtons = document.querySelectorAll('[data-tab-target]');
-  const tabContents = document.querySelectorAll('[data-tab-content]');
+    // Switch Tabs
+    const tabs = document.querySelectorAll(".tab-btn");
+    const contents = document.querySelectorAll(".tab-content");
 
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetId = btn.getAttribute('data-tab-target');
+    tabs.forEach(btn => {
+        btn.addEventListener("click", () => {
+            tabs.forEach(b => b.classList.remove("active-tab"));
+            btn.classList.add("active-tab");
 
-      tabButtons.forEach(b => {
-        b.classList.remove('border-orange-600', 'text-orange-600', 'font-semibold');
-        b.classList.add('border-transparent', 'text-gray-600');
-      });
-      tabContents.forEach(c => c.classList.add('hidden'));
-
-      btn.classList.add('border-orange-600', 'text-orange-600', 'font-semibold');
-      btn.classList.remove('text-gray-600', 'border-transparent');
-      document.getElementById(targetId).classList.remove('hidden');
-    });
-  });
-
-  // =========================
-  // 👤 ACCOUNT INFO LOGIC
-  // =========================
-  const accountForm = document.getElementById('accountInfoForm');
-  const profileNameDisplay = document.getElementById('profileNameDisplay');
-  const profileEmailDisplay = document.getElementById('profileEmailDisplay');
-  const editProfileInfoBtn = document.getElementById('editProfileInfoBtn');
-
-  editProfileInfoBtn.addEventListener('click', () => {
-    document.getElementById('fullName').focus();
-  });
-
-  accountForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const fullNameField = document.getElementById('fullName');
-    const emailField = document.getElementById('email');
-    let valid = true;
-
-    // Name validation
-    const nameError = fullNameField.parentElement.querySelector('p.text-red-600');
-    if (!fullNameField.value.trim()) {
-      fullNameField.classList.add('border-red-500');
-      nameError.classList.remove('hidden');
-      valid = false;
-    } else {
-      fullNameField.classList.remove('border-red-500');
-      nameError.classList.add('hidden');
-    }
-
-    // Email validation
-    const emailError = emailField.parentElement.querySelector('p.text-red-600');
-    if (!emailField.value.trim() || !emailField.value.includes('@')) {
-      emailField.classList.add('border-red-500');
-      emailError.classList.remove('hidden');
-      valid = false;
-    } else {
-      emailField.classList.remove('border-red-500');
-      emailError.classList.add('hidden');
-    }
-
-    if (!valid) return;
-
-    profileNameDisplay.textContent = fullNameField.value.trim();
-    profileEmailDisplay.textContent = emailField.value.trim();
-    alert('✅ Account info updated!');
-  });
-
-  // =========================
-  // 📦 ADDRESSES LOGIC
-  // =========================
-
-  // Basic in-memory dummy addresses
-  let addresses = [
-    {
-      id: 'addr_1',
-      label: 'Home',
-      name: 'Junaiedur Rahman',
-      district: 'Dhaka',
-      city: 'Uttara',
-      area: 'Sector 9',
-      street: 'House 32, Road 4',
-      postal: '1230',
-      countryCode: '+880',
-      phoneNumber: '1711000000',
-      isDefault: true
-    },
-    {
-      id: 'addr_2',
-      label: 'Office',
-      name: 'Rahim Uddin',
-      district: 'Dhaka',
-      city: 'Banani',
-      area: 'Block E',
-      street: '5th Floor, Road 20',
-      postal: '1213',
-      countryCode: '+880',
-      phoneNumber: '1812111111',
-      isDefault: false
-    }
-  ];
-
-  const addressListEl = document.getElementById('addressList');
-  const addAddressBtn = document.getElementById('addAddressBtn');
-  const addressFormSection = document.getElementById('addressFormSection');
-  const addressForm = document.getElementById('profileAddressForm');
-  const addressFormTitle = document.getElementById('addressFormTitle');
-  const cancelAddressFormBtn = document.getElementById('cancelAddressFormBtn');
-  const editingAddressIdField = document.getElementById('editingAddressId');
-
-  const p_fields = {
-    district: document.getElementById('p_district'),
-    city: document.getElementById('p_city'),
-    area: document.getElementById('p_area'),
-    street: document.getElementById('p_street'),
-    postal: document.getElementById('p_postal'),
-    countryCode: document.getElementById('p_countryCode'),
-    phoneNumber: document.getElementById('p_phoneNumber'),
-    label: document.getElementById('p_label'),
-    customLabel: document.getElementById('p_customLabel'),
-    default: document.getElementById('p_default'),
-  };
-  const p_phoneError = document.getElementById('p_phoneError');
-
-  function renderAddresses() {
-    addressListEl.innerHTML = '';
-
-    if (addresses.length === 0) {
-      addressListEl.innerHTML = '<p class="text-sm text-gray-500">No saved addresses yet. Click "Add New Address" to create one.</p>';
-      return;
-    }
-
-    addresses.forEach(addr => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'p-4 border rounded-lg flex flex-col sm:flex-row sm:items-start justify-between gap-3';
-      wrapper.setAttribute('data-address-id', addr.id);
-
-      const left = document.createElement('div');
-      left.className = 'flex-1 space-y-1';
-
-      const headerRow = document.createElement('div');
-      headerRow.className = 'flex items-center gap-2 mb-1';
-
-      // Remove button with icon on LEFT
-      const removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.className = 'flex items-center text-xs text-red-600 hover:text-red-700 font-medium';
-      removeBtn.innerHTML = `
-        <img src="{% static 'images/remove.png' %}" alt="Remove" class="w-4 h-4 mr-1 inline-block">
-        <span>Remove</span>
-      `;
-      removeBtn.addEventListener('click', () => handleRemoveAddress(addr.id));
-
-      const labelSpan = document.createElement('span');
-      labelSpan.className = 'text-sm font-semibold text-gray-900';
-      labelSpan.textContent = addr.label;
-
-      headerRow.appendChild(removeBtn);
-      headerRow.appendChild(labelSpan);
-
-      if (addr.isDefault) {
-        const badge = document.createElement('span');
-        badge.className = 'ml-2 text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-0.5 rounded';
-        badge.textContent = 'Default';
-        headerRow.appendChild(badge);
-      }
-
-      const nameP = document.createElement('p');
-      nameP.className = 'text-sm text-gray-800';
-      nameP.textContent = `Name: ${addr.name || '—'}`;
-
-      const addrP = document.createElement('p');
-      addrP.className = 'text-sm text-gray-700';
-      addrP.textContent = `Address: ${addr.street}, ${addr.area}, ${addr.city} — ${addr.district} ${addr.postal}`;
-
-      const phoneP = document.createElement('p');
-      phoneP.className = 'text-xs text-gray-500';
-      phoneP.textContent = `Phone: ${addr.countryCode}${addr.phoneNumber}`;
-
-      left.appendChild(headerRow);
-      left.appendChild(nameP);
-      left.appendChild(addrP);
-      left.appendChild(phoneP);
-
-      const right = document.createElement('div');
-      right.className = 'flex gap-2';
-
-      const editBtn = document.createElement('button');
-      editBtn.type = 'button';
-      editBtn.className = 'px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 transition';
-      editBtn.textContent = 'Edit';
-      editBtn.addEventListener('click', () => openEditAddressForm(addr.id));
-
-      right.appendChild(editBtn);
-
-      if (!addr.isDefault) {
-        const setDefaultBtn = document.createElement('button');
-        setDefaultBtn.type = 'button';
-        setDefaultBtn.className = 'px-3 py-1 rounded-lg text-xs font-medium bg-orange-600 text-white hover:bg-orange-700 transition';
-        setDefaultBtn.textContent = 'Set as Default';
-        setDefaultBtn.addEventListener('click', () => setDefaultAddress(addr.id));
-        right.appendChild(setDefaultBtn);
-      }
-
-      wrapper.appendChild(left);
-      wrapper.appendChild(right);
-      addressListEl.appendChild(wrapper);
-    });
-  }
-
-  function resetAddressForm() {
-    Object.values(p_fields).forEach(f => {
-      if (f === p_fields.default) {
-        f.checked = false;
-      } else if (f === p_fields.customLabel) {
-        f.value = '';
-        f.classList.add('hidden');
-      } else {
-        f.value = '';
-      }
-      f.classList.remove('border-red-500');
-    });
-    document.querySelectorAll('#profileAddressForm .field-error').forEach(e => e.classList.add('hidden'));
-    p_phoneError.classList.add('hidden');
-    editingAddressIdField.value = '';
-  }
-
-  function openAddAddressForm() {
-    resetAddressForm();
-    addressFormTitle.textContent = 'Add New Address';
-    addressFormSection.classList.remove('hidden');
-    p_fields.district.focus();
-  }
-
-  function openEditAddressForm(id) {
-    const addr = addresses.find(a => a.id === id);
-    if (!addr) return;
-
-    resetAddressForm();
-    editingAddressIdField.value = id;
-    addressFormTitle.textContent = 'Edit Address';
-
-    p_fields.district.value = addr.district;
-    p_fields.city.value = addr.city;
-    p_fields.area.value = addr.area;
-    p_fields.street.value = addr.street;
-    p_fields.postal.value = addr.postal;
-    p_fields.countryCode.value = addr.countryCode || '+880';
-    p_fields.phoneNumber.value = addr.phoneNumber;
-    p_fields.default.checked = !!addr.isDefault;
-
-    // Label/custom label
-    if (addr.label === 'Home' || addr.label === 'Office') {
-      p_fields.label.value = addr.label;
-      p_fields.customLabel.classList.add('hidden');
-      p_fields.customLabel.value = '';
-    } else {
-      p_fields.label.value = 'Other';
-      p_fields.customLabel.classList.remove('hidden');
-      p_fields.customLabel.value = addr.label;
-    }
-
-    addressFormSection.classList.remove('hidden');
-    p_fields.district.focus();
-  }
-
-  function setDefaultAddress(id) {
-    addresses = addresses.map(a => ({ ...a, isDefault: a.id === id }));
-    renderAddresses();
-  }
-
-  function handleRemoveAddress(id) {
-    if (!confirm('Are you sure you want to remove this address?')) return;
-    addresses = addresses.filter(a => a.id !== id);
-    if (!addresses.some(a => a.isDefault) && addresses.length > 0) {
-      addresses[0].isDefault = true;
-    }
-    renderAddresses();
-  }
-
-  function validateRequiredField(field) {
-    const err = field.closest('div').querySelector('.field-error');
-    if (!field.value.trim()) {
-      field.classList.add('border-red-500');
-      if (err) err.classList.remove('hidden');
-      return false;
-    }
-    field.classList.remove('border-red-500');
-    if (err) err.classList.add('hidden');
-    return true;
-  }
-
-  function validatePhoneField() {
-    const val = p_fields.phoneNumber.value.trim();
-    const valid = /^[0-9]{6,15}$/.test(val);
-    if (!valid) {
-      p_fields.phoneNumber.classList.add('border-red-500');
-      p_phoneError.classList.remove('hidden');
-    } else {
-      p_fields.phoneNumber.classList.remove('border-red-500');
-      p_phoneError.classList.add('hidden');
-    }
-    return valid;
-  }
-
-  // Label / custom label toggle
-  p_fields.label.addEventListener('change', () => {
-    if (p_fields.label.value === 'Other') {
-      p_fields.customLabel.classList.remove('hidden');
-      p_fields.customLabel.setAttribute('required', 'true');
-    } else {
-      p_fields.customLabel.classList.add('hidden');
-      p_fields.customLabel.removeAttribute('required');
-      p_fields.customLabel.value = '';
-      p_fields.customLabel.classList.remove('border-red-500');
-      const err = p_fields.customLabel.closest('div').querySelector('.field-error');
-      if (err) err.classList.add('hidden');
-    }
-  });
-
-  addAddressBtn.addEventListener('click', openAddAddressForm);
-
-  cancelAddressFormBtn.addEventListener('click', () => {
-    addressFormSection.classList.add('hidden');
-    resetAddressForm();
-  });
-
-  addressForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    let valid = true;
-
-    // Required basic fields
-    [
-      p_fields.district,
-      p_fields.city,
-      p_fields.area,
-      p_fields.street,
-      p_fields.postal,
-      p_fields.countryCode,
-      p_fields.phoneNumber,
-      p_fields.label
-    ].forEach(f => {
-      if (!validateRequiredField(f)) valid = false;
+            contents.forEach(c => c.classList.add("hidden"));
+            document.getElementById(btn.dataset.tab).classList.remove("hidden");
+        });
     });
 
-    if (p_fields.label.value === 'Other') {
-      if (!validateRequiredField(p_fields.customLabel)) valid = false;
+    // Edit Address Modal Fill
+    function openEditAddressModal(id, name, phone, line1, line2, city, state, postal, country, isDefault) {
+
+        document.getElementById('editAddressForm').action = `/account/address/edit/${id}/`;
+
+        document.getElementById('e_full_name').value = name;
+        document.getElementById('e_phone').value = phone;
+
+        document.getElementById('e_address_line_1').value = line1;
+        document.getElementById('e_address_line_2').value = line2;
+
+        document.getElementById('e_city').value = city;
+        document.getElementById('e_state').value = state;
+        document.getElementById('e_postal_code').value = postal;
+        document.getElementById('e_country').value = country;
+
+        document.getElementById('e_is_default').checked = isDefault;
+
+        document.getElementById('editAddressModal').classList.remove('hidden');
     }
-
-    if (!validatePhoneField()) valid = false;
-
-    if (!valid) return;
-
-    const labelValue = p_fields.label.value === 'Other'
-      ? p_fields.customLabel.value.trim()
-      : p_fields.label.value;
-
-    const fullPhone = p_fields.phoneNumber.value.trim();
-
-    const isDefault = p_fields.default.checked;
-
-    const editingId = editingAddressIdField.value;
-
-    if (editingId) {
-      // Update existing
-      addresses = addresses.map(a => {
-        if (a.id !== editingId) {
-          return isDefault ? { ...a, isDefault: false } : a;
-        }
-        return {
-          ...a,
-          label: labelValue,
-          district: p_fields.district.value.trim(),
-          city: p_fields.city.value.trim(),
-          area: p_fields.area.value.trim(),
-          street: p_fields.street.value.trim(),
-          postal: p_fields.postal.value.trim(),
-          countryCode: p_fields.countryCode.value,
-          phoneNumber: fullPhone,
-          isDefault: isDefault ? true : a.isDefault
-        };
-      });
-    } else {
-      // Add new
-      const newId = 'addr_' + (Date.now());
-      if (isDefault) {
-        addresses = addresses.map(a => ({ ...a, isDefault: false }));
-      }
-      addresses.push({
-        id: newId,
-        label: labelValue,
-        name: profileNameDisplay.textContent || '—',
-        district: p_fields.district.value.trim(),
-        city: p_fields.city.value.trim(),
-        area: p_fields.area.value.trim(),
-        street: p_fields.street.value.trim(),
-        postal: p_fields.postal.value.trim(),
-        countryCode: p_fields.countryCode.value,
-        phoneNumber: fullPhone,
-        isDefault: isDefault || addresses.length === 0
-      });
-    }
-
-    renderAddresses();
-    resetAddressForm();
-    addressFormSection.classList.add('hidden');
-    alert('✅ Address saved successfully!');
-  });
-
-  // =========================
-  // 🔐 SECURITY LOGIC
-  // =========================
-  const securityForm = document.getElementById('securityForm');
-  const newPasswordField = document.getElementById('newPassword');
-  const confirmPasswordField = document.getElementById('confirmPassword');
-
-  securityForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    let valid = true;
-
-    const passErr = newPasswordField.parentElement.querySelector('p.text-red-600');
-    if (!newPasswordField.value.trim() || newPasswordField.value.length < 6) {
-      newPasswordField.classList.add('border-red-500');
-      passErr.classList.remove('hidden');
-      valid = false;
-    } else {
-      newPasswordField.classList.remove('border-red-500');
-      passErr.classList.add('hidden');
-    }
-
-    const confirmErr = confirmPasswordField.parentElement.querySelector('p.text-red-600');
-    if (confirmPasswordField.value.trim() !== newPasswordField.value.trim()) {
-      confirmPasswordField.classList.add('border-red-500');
-      confirmErr.classList.remove('hidden');
-      valid = false;
-    } else {
-      confirmPasswordField.classList.remove('border-red-500');
-      confirmErr.classList.add('hidden');
-    }
-
-    if (!valid) return;
-
-    alert('✅ Password updated successfully! (frontend only)');
-    newPasswordField.value = '';
-    confirmPasswordField.value = '';
-  });
-
-  // =========================
-  // 🎯 INIT
-  // =========================
-  document.addEventListener('DOMContentLoaded', () => {
-    renderAddresses();
-  });
 </script>
+
+
+<!-- Tailwind helper (small inputs) -->
+<style>
+    .input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        outline: none;
+    }
+    .input:focus {
+        border-color: #fb923c;
+        box-shadow: 0 0 4px #fcd9b6;
+    }
+
+    .tab-btn {
+        padding: 8px 14px;
+        border-bottom-width: 2px;
+        font-weight: 500;
+        color: gray;
+        cursor: pointer;
+    }
+    .active-tab {
+        color: #fb923c;
+        border-color: #fb923c;
+        font-weight: 600;
+    }
+</style>
+
+{% endblock %}

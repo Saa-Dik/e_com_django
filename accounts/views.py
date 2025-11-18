@@ -2,8 +2,8 @@
 #asle change kore nio 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpRequest
-from .forms import RegistationForm
-from .models import Account
+from .forms import RegistationForm ,ProfileUpdateForm, AddressForm
+from .models import Account , Address , UserAddress
 from core.views import home
 from carts.views import _cart_id
 from carts.models import Cart, CartItem
@@ -242,7 +242,6 @@ def resetPassword(request):
 
 # def home(request):
 #     return render(request, 'index.html')
-@login_required(login_url='login')
 # def profile(request):
 #     user = request.user
 #     orders = Order.objects.filter(user=user).values(
@@ -256,35 +255,87 @@ def resetPassword(request):
 #         'addresses': orders
 #     }   
 #     return render(request, 'account/profile.html', context)
+@login_required(login_url='login')
 def profile(request):
-    #
     user = request.user
-    orders = Order.objects.filter(
-        user=user, is_ordered=True
-    ).order_by('-created_at')
-    unique_addresses = OrderedDict()
-    for order in orders:
-        addr_keys  = f"{order.address_line_1}|{order.address_line_2}|{order.city}|{order.state}|{order.country}|{order.phone}"
+    addresses = UserAddress.objects.filter(user=user).order_by('-is_default', '-created_at')
+    # Profile Update
+    if request.method == "POST" and 'update_profile' in request.POST:
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.email = request.POST.get('email')
+        user.phone_number = request.POST.get('phone_number')
+        user.save()
+        messages.success(request, "Profile Updated!")
+        return redirect('profile')
+    return render(request, 'account/profile.html', {
+        'user': user,
+        'addresses': addresses,
+    })
 
-        if addr_keys not in unique_addresses:
-            unique_addresses[addr_keys] = order
-    
-    default_address = None
-    if unique_addresses:
-        default_address = list(unique_addresses.values())[0]
-        context = {
-            'user': user,
-            'addresses': unique_addresses.values(),  # merged
-            'default_address': default_address,       # for highlight
-        }
-        return render(request, 'account/profile.html', context)
+@login_required(login_url='login')
+def add_address(request):
+    if request.method == 'POST':
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            new_addr = form.save(commit=False)
+            new_addr.user = request.user
+
+            # If no address exists OR checkbox "default" selected
+            if UserAddress.objects.filter(user=request.user).count() == 0 or request.POST.get('is_default'):
+                UserAddress.objects.filter(user=request.user).update(is_default=False)
+                new_addr.is_default = True
+
+            new_addr.save()
+            messages.success(request, "Address Added Successfully!")
+            return redirect('profile')
+
+    return redirect('profile')
+
+@login_required(login_url='login')
+def edit_address(request, id):
+    address = get_object_or_404(UserAddress, id=id, user=request.user)
+
+    if request.method == 'POST':
+        form = AddressForm(request.POST, instance=address)
+        if form.is_valid():
+            updated = form.save(commit=False)
+
+            if request.POST.get('is_default'):
+                UserAddress.objects.filter(user=request.user).update(is_default=False)
+                updated.is_default = True
+
+            updated.save()
+            messages.success(request, "Address Updated!")
+            return redirect('profile')
+
+    return redirect('profile')
+@login_required(login_url='login')
+def delete_address(request, id):
+    address = get_object_or_404(UserAddress, id=id, user=request.user)
+    address.delete()
+
+    # If default deleted → another address default
+    remaining = UserAddress.objects.filter(user=request.user)
+    if remaining.exists() and not remaining.filter(is_default=True).exists():
+        first_addr = remaining.first()
+        first_addr.is_default = True
+        first_addr.save()
+
+    messages.success(request, "Address Deleted!")
+    return redirect('profile')
 
 
+@login_required(login_url='login')
+def set_default_address(request, id):
+    address = get_object_or_404(UserAddress, id=id, user=request.user)
 
+    UserAddress.objects.filter(user=request.user).update(is_default=False)
+    address.is_default = True
+    address.save()
 
-
-
-
+    messages.success(request, "Default Address Updated!")
+    return redirect('profile')
 
 
 

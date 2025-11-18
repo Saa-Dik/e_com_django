@@ -5,14 +5,18 @@ from bestdeal.models import BestDeal
 
 from store.models import SubBanner
 
-from store.models import SubBanner
-
 def home(request):
     sub_banners = SubBanner.objects.all()
-    best_deals = BestDeal.objects.filter(is_active=True)
-    best_deal_products = [deal.product for deal in best_deals]
-
+    deals = BestDeal.objects.filter(is_active=True).select_related("product").order_by("display_order")  
+    products = Product.objects.filter(is_available=True).order_by('-views', '-cart_added')[:4]
+    best_deal_products = Product.objects.filter(
+        id__in=deals.values_list("product_id", flat=True),
+        is_available=True
+    )
     context = {
         'sub_banners': sub_banners,
+        'best_deal_products': best_deal_products,   # <-- index.html loop
+        'best_deals': deals, 
+        'products': products,
     }
     return render(request, 'index.html', context)
