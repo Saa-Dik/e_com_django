@@ -31,10 +31,10 @@
                         {% endif %}
                     </div>
 
-                    <!-- <button onclick="document.getElementById('editProfileModal').classList.remove('hidden')"
+                    <button onclick="document.getElementById('editProfileModal').classList.remove('hidden')"
                         class="px-4 py-2 rounded-lg bg-orange-600 text-white text-sm font-medium hover:bg-orange-700">
                         Edit Info
-                    </button> -->
+                    </button>
                 </div>
             </div>
         </section>
@@ -132,20 +132,13 @@
                             </p>
 
                             <div class="flex gap-2 mt-3">
-                                <button onclick="openEditAddressModal({{ addr.id }}, '{{ addr.full_name }}', 
-                                        '{{ addr.phone }}', '{{ addr.address_line_1 }}', 
-                                        '{{ addr.address_line_2 }}', '{{ addr.city }}',
-                                        '{{ addr.state }}', '{{ addr.postal_code }}', '{{ addr.country }}',
-                                        {{ addr.is_default|yesno:"true,false" }})"
-                                    class="px-3 py-1 bg-gray-200 rounded text-xs">
-                                    Edit
-                                </button>
+                              <button onclick = openEditAddressModal({{ add.id }}, '{{ addr.full_name }}','{{ addr.phone }}', '{{ addr.address_line_1 }}','{{ addr.address_line_2 }}', '{{ addr.city }}', '{{ addr.state }}', '{{ addr.postal_code }}', '{{ addr.country }}', {{ addr.is_default|yesno:"true,false" }})" )class="px-3 py-1 bg-gray-200 rounded text-xs">
+                                Edit
+                              </button>
 
-                                <a href="{% url 'delete_address' addr.id %}"
-                                   onclick="return confirm('Delete address?')"
-                                   class="px-3 py-1 bg-red-300 rounded text-xs">
+                              <a href="{% url 'delete_address' addr.id %}" onclick="return confirm('Delete address?')" class="px-3 py-1 bg-red-300 rounded text-xs">
                                     Delete
-                                </a>
+                              </a>
                             </div>
 
                         </div>

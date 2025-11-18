@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     'bestdeal',
     'flashsale',
     'wishlist',
+    'profile',
 
   
 ]
@@ -138,6 +139,7 @@ TEMPLATES = [
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
                 'wishlist.context_processors.wishlist_count',
+                'category.context_processors.menu_links',
             ],
         },
     },

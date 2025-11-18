@@ -14,6 +14,7 @@ from reviews.models import Review
 from django.db.models import Q, Min, Max 
 from bestdeal.views import best_deals
 from flashsale.views import flash_sale
+from django.shortcuts import render, get_object_or_404
 # Create your views here.
 # def store(request, category_slug=None):
 #     categories = None
@@ -36,102 +37,82 @@ from flashsale.views import flash_sale
 #         'product_count': product_count,
 #     }
 #     return render(request, 'store/store.html', context)
-
 def store(request, category_slug=None):
-    categories = None
+    category = None
+    products = None
 
-    
-    products = Product.objects.filter(is_available=True)
-
-    # 
-    if category_slug is not None:
-        categories = get_object_or_404(Category, slug=category_slug)
-        products = products.filter(category=categories)
-
-    # ======  ======
-    selected_size = request.GET.get('size')
-    selected_color = request.GET.get('color')
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
-
-    # size 
-    if selected_size:
-        products = products.filter(
-            variation__variation_category='size',
-            variation__variation_value=selected_size,
-            variation__is_active=True,
-        )
-
-    # color 
-    if selected_color:
-        products = products.filter(
-            variation__variation_category='color',
-            variation__variation_value=selected_color,
-            variation__is_active=True,
-        )
-
-    # price 
-    if min_price:
-        products = products.filter(price__gte=min_price)
-
-    if max_price:
-        products = products.filter(price__lte=max_price)
-
-    products = products.distinct()
-
-    available_sizes = Variation.objects.filter(
-        variation_category='size',
-        is_active=True,
-        product__is_available=True,
-    ).values_list('variation_value', flat=True).distinct()
-
-    available_colors = Variation.objects.filter(
-        variation_category='color',
-        is_active=True,
-        product__is_available=True,
-    ).values_list('variation_value', flat=True).distinct()
-
-    # ====== daynamic price range (min / max) ======
-    base_price_qs = Product.objects.filter(is_available=True)
-    if category_slug is not None:
-        base_price_qs = base_price_qs.filter(category=categories)
-
-    price_stats = base_price_qs.aggregate(
-        price_min=Min('price'),
-        price_max=Max('price'),
-    )
-    price_min = price_stats['price_min']
-    price_max = price_stats['price_max']
-
-    # ====== Pagination ======
-    if category_slug is not None:
-        per_page = 2
+    # ============================
+    # CATEGORY FILTER
+    # ============================
+    if category_slug:
+        category = get_object_or_404(Category, slug=category_slug)
+        products = Product.objects.filter(category=category, is_available=True)
     else:
-        per_page = 5
+        products = Product.objects.filter(is_available=True)
 
-    paginator = Paginator(products, per_page)
+    # ============================
+    # SIZE FILTER
+    # ============================
+    selected_size = request.GET.get('size')
+    if selected_size:
+        products = products.filter(variation__variation_category='size',variation__variation_value__iexact=selected_size)
+
+    # Collect all sizes available
+    available_sizes = (Variation.objects.filter(variation_category='size').values_list('variation_value', flat=True).distinct())
+
+    # ============================
+    # COLOR FILTER
+    # ============================
+    selected_color = request.GET.get('color')
+    if selected_color:
+        products = products.filter(variation__variation_category='color',variation__variation_value__iexact=selected_color)
+
+    # Collect all colors available
+    available_colors = (Variation.objects.filter(variation_category='color').values_list('variation_value', flat=True).distinct())
+
+    # ============================
+    # PRICE FILTER
+    # ============================
+    price_min = Product.objects.all().order_by('price').first().price if Product.objects.exists() else 0
+    price_max = Product.objects.all().order_by('-price').first().price if Product.objects.exists() else 1000
+
+    selected_min_price = request.GET.get('min_price')
+    selected_max_price = request.GET.get('max_price')
+
+    if selected_min_price:
+        products = products.filter(price__gte=selected_min_price)
+    if selected_max_price:
+        products = products.filter(price__lte=selected_max_price)
+
+    # ============================
+    # PAGINATION
+    # ============================
+    paginator = Paginator(products, 12)
     page = request.GET.get('page')
     paged_products = paginator.get_page(page)
+
     product_count = products.count()
 
     context = {
         'products': paged_products,
         'product_count': product_count,
+
+        # Filters
         'available_sizes': available_sizes,
         'available_colors': available_colors,
         'price_min': price_min,
         'price_max': price_max,
+
         'selected_size': selected_size,
         'selected_color': selected_color,
-        'selected_min_price': min_price,
-        'selected_max_price': max_price,
+        'selected_min_price': selected_min_price,
+        'selected_max_price': selected_max_price,
     }
     return render(request, 'store/store.html', context)
 
-
-
 #search diye kojar jnno use korteci
 def search(request):
+
     products = Product.objects.none()   # default empty
     product_count = 0                   # default count
     if 'keyword' in request.GET:
@@ -171,12 +152,6 @@ def search(request):
 #         'reviews': reviews,   # 
 #     }
 #     return render(request, 'store/product_detail.html', context)
-from django.shortcuts import render, get_object_or_404
-from carts.views import _cart_id
-from carts.models import CartItem
-from order.models import OrderProduct
-from reviews.models import Review
-from .models import Product
 
 
 def product_detail(request, category_slug, product_slug):
