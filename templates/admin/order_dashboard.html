@@ -1,0 +1,133 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">📦 Order Management Dashboard</h1>
+
+<div class="grid grid-cols-4 gap-4">
+
+    <div class="p-4 bg-white shadow rounded">
+        <h2 class="text-lg font-bold">Total Orders</h2>
+        <p class="text-3xl text-blue-600">{{ total_orders }}</p>
+    </div>
+
+    <div class="p-4 bg-white shadow rounded">
+        <h2 class="text-lg font-bold">Pending</h2>
+        <p class="text-3xl text-yellow-600">{{ pending_orders }}</p>
+    </div>
+
+    <div class="p-4 bg-white shadow rounded">
+        <h2 class="text-lg font-bold">Completed</h2>
+        <p class="text-3xl text-green-600">{{ completed_orders }}</p>
+    </div>
+
+    <div class="p-4 bg-white shadow rounded">
+        <h2 class="text-lg font-bold">Today's Orders</h2>
+        <p class="text-3xl text-purple-600">{{ todays_orders }}</p>
+    </div>
+</div>
+
+<br>
+
+<div class="grid grid-cols-2 gap-4">
+    <div class="p-4 bg-white shadow rounded">
+        <h2 class="text-lg font-bold">Total Revenue</h2>
+        <p class="text-3xl text-green-700">{{ total_revenue }} TK</p>
+    </div>
+
+    <div class="p-4 bg-white shadow rounded">
+        <h2 class="text-lg font-bold">Today's Revenue</h2>
+        <p class="text-3xl text-blue-700">{{ todays_revenue }} TK</p>
+    </div>
+</div>
+
+<br>
+
+<h2 class="text-xl font-bold mt-6">🧾 Latest Orders</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for o in latest_orders %}
+        <tr>
+            <td>{{ o.order_number }}</td>
+            <td>{{ o.full_name }}</td>
+            <td>{{ o.order_total }} TK</td>
+            <td>{{ o.status }}</td>
+            <td>{{ o.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+
+<h2 class="text-xl font-bold mt-6">🔥 Best Selling Products</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Total Sold</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in best_selling %}
+        <tr>
+            <td>{{ p.product__product_name }}</td>
+            <td>{{ p.total_sold }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h2 class="text-xl font-bold mt-8">📈 Sales (Last 7 Days)</h2>
+<canvas id="lineChart" height="100"></canvas>
+<h2 class="text-xl font-bold mt-8">📊 Monthly Revenue (Last 6 Months)</h2>
+<canvas id="barChart" height="120"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// ---- Line Chart ----
+const lineCtx = document.getElementById('lineChart');
+
+new Chart(lineCtx, {
+    type: 'line',
+    data: {
+        labels: {{ line_labels|safe }},
+        datasets: [{
+            label: 'Daily Sales (Tk)',
+            data: {{ line_values|safe }},
+            borderColor: 'rgba(255, 99, 132, 1)',
+            tension: 0.4,
+            fill: false,
+            borderWidth: 3,
+        }]
+    }
+});
+
+// ---- Bar Chart ----
+const barCtx = document.getElementById('barChart');
+
+new Chart(barCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ bar_labels|safe }},
+        datasets: [{
+            label: 'Monthly Revenue (Tk)',
+            data: {{ bar_values|safe }},
+            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2,
+        }]
+    }
+});
+</script>
+
+{% endblock %}

@@ -27,10 +27,10 @@ USE_WEASY = True
 BKASH_CONFIG = {
     'BASE_URL': 'https://tokenized.sandbox.bka.sh/v1.2.0-beta',  # Sandbox URL
     # 'BASE_URL': 'https://tokenized.pay.bka.sh/v1.2.0-beta',  # Production URL
-    'APP_KEY': 'your_bkash_app_key_here',
-    'APP_SECRET': 'your_bkash_app_secret_here',
-    'USERNAME': 'your_bkash_username_here',
-    'PASSWORD': 'your_bkash_password_here',
+    'APP_KEY': '',
+    'APP_SECRET': '',
+    'USERNAME': '',
+    'PASSWORD': '',
 }
 
 # Callback URL for bKash
@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # config app:
+    'jazzmin',
     'accounts',
     'reviews',
     'category',
@@ -84,6 +85,7 @@ INSTALLED_APPS = [
     'flashsale',
     'wishlist',
     'profile',
+    'orderlist',
 
   
 ]
@@ -93,9 +95,10 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1087000889936-vabi7r29me5vsogj1n4e1squjppjh3kl.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
-SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
+
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1050442585736-vvjh3l5p3i18gr0df8fl9il11j93i9s2.apps.googleusercontent.com'
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+# SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
@@ -264,9 +267,10 @@ SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 ADMIN_EMAIL = 'admin@yourdomain.com'  # Replace with your admin email
 
 # Session settings
-SESSION_COOKIE_AGE = 86400  # 24 hours in seconds
-SESSION_SAVE_EVERY_REQUEST = True
-
+# SESSION_COOKIE_AGE = 86400  # 24 hours in seconds
+# SESSION_SAVE_EVERY_REQUEST = True
+# # SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1050442585736-vvjh3l5p3i18gr0df8fl9il11j93i9s2.apps.googleusercontent.com'
+# # SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 # --- settings.py ---
 COMPANY_INFO = {
@@ -293,6 +297,125 @@ COMPANY_INFO = {
 
 # LOGIN_REDIRECT_URL = 'dashboard'
 # LOGOUT_REDIRECT_URL = 'login'
-
 # SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1050442585736-vvjh3l5p3i18gr0df8fl9il11j93i9s2.apps.googleusercontent.com'
 # SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
+
+# e_com/settings.py
+
+JAZZMIN_SETTINGS = {
+    "site_title": "E-Com Admin Panel",
+    "site_header": "E-Com Dashboard",
+    "site_brand": "E-Com Admin",
+    "welcome_sign": "Welcome to Your E-Commerce Admin Panel",
+    "copyright": "E-Com © All Rights Reserved",
+    "site_logo": "images/logo.png",
+    "login_logo": "images/logo.png",
+    "login_logo_dark": None,
+    "site_logo_classes": "img-circle",
+    "show_ui_builder": False,   # UI Builder Off
+
+    # User Avatar
+    "user_avatar": "accounts.Account.profile_picture",
+
+    # Top Bar Links
+    "topbar_links": [
+        {"name": "Visit Store", "url": "/", "new_window": True},
+        {"name": "Documentation", "url": "https://docs.djangoproject.com/", "new_window": True},
+        {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
+    ],
+
+    
+    # ➤ Side Menu Icons
+    "icons": {
+        "accounts.Account": "fas fa-user",
+        "category.Category": "fas fa-tags",
+        "store.Product": "fas fa-box",
+        "reviews.Review": "fas fa-comments",
+        "carts.Cart": "fas fa-shopping-cart",
+        "order.Order": "fas fa-file-invoice",
+        "order.OrderProduct": "fas fa-box-open",
+        "Coupon.Coupon": "fas fa-ticket-alt",
+        "bestdeal.BestDeal": "fas fa-bolt",
+        "flashsale.FlashSale": "fas fa-fire",
+        "wishlist.Wishlist": "fas fa-heart",
+        "payment.Payment": "fas fa-credit-card",
+    },
+
+    # ➤ Sidebar Grouping (BEST for Ecommerce Admin)
+    "order_with_respect_to": [
+        "accounts",
+        "category",
+        "store",
+        "reviews",
+        "carts",
+        "order",
+        "Coupon",
+        "bestdeal",
+        "flashsale",
+        "wishlist",
+        "payment",
+    ],
+
+    "app_list": [
+        {
+            "name": "E-Commerce Management",
+            "icon": "fas fa-store",
+            "models": [
+                "category.Category",
+                "store.Product",
+                "reviews.Review",
+                "wishlist.Wishlist",
+            ]
+        },
+        {
+            "name": "Sales & Promotions",
+            "icon": "fas fa-percentage",
+            "models": [
+                "Coupon.Coupon",
+                "bestdeal.BestDeal",
+                "flashsale.FlashSale",
+            ]
+        },
+        {
+            "name": "Users & Customers",
+            "icon": "fas fa-users",
+            "models": [
+                "accounts.Account",
+            ]
+        },
+        {
+            "name": "Orders & Transactions",
+            "icon": "fas fa-file-invoice",
+            "models": [
+                "order.Order",
+                "order.OrderProduct",
+                "payment.Payment",
+            ]
+        },
+    ],
+
+    "custom_links": {
+        "order": [
+            {
+                "name": "Order Dashboard",
+                "url": "order_dashboard",
+                "icon": "fas fa-chart-line",
+               
+            }
+        ]
+    },
+
+    # Custom Colors / Theme
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "theme": "cosmo",  # Flatly, pulse, darkly, solar, sketchy etc also available
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "flatly",
+    "dark_mode_theme": "darkly",
+    "navbar": "navbar-orange",
+    "footer_small_text": False,
+    "body_small_text": False,
+}
